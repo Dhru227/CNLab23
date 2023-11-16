@@ -5,12 +5,7 @@ from packet import Packet
 
 
 class Client:
-    """Client class sends periodic "traceroute" packets and returns routes that
-       these packets take back to the network object."""
-
-
     def __init__(self, addr, allClients, sendRate, updateFunction):
-        """Inititalize parameters"""
         self.addr = addr
         self.allClients = allClients
         self.sendRate = sendRate
@@ -22,21 +17,17 @@ class Client:
 
 
     def changeLink(self, change):
-        """Add a link to the client.
-           The change argument should be a tuple ('up', link)"""
+    
         self.linkChanges.put(change)
 
 
     def handlePacket(self, packet):
-        """Handle receiving a packet.  If it's a routing packet, ignore.
-           If it's a "traceroute" packet, update the network object with it's
-           route"""
+       
         if packet.kind == Packet.TRACEROUTE:
             self.updateFunction(packet.srcAddr, packet.dstAddr, packet.route)
 
 
     def sendTraceroutes(self):
-        """Send "traceroute" packets to every other client in the network"""
         for dstClient in self.allClients:
             packet = Packet(Packet.TRACEROUTE, self.addr, dstClient)
             if self.link:
@@ -45,14 +36,12 @@ class Client:
 
 
     def handleTime(self, timeMillisecs):
-        """Send traceroute packets regularly"""
         if self.sending and (timeMillisecs - self.lastTime > self.sendRate):
             self.sendTraceroutes()
             self.lastTime = timeMillisecs
 
 
     def runClient(self):
-        """Main loop of client"""
         while True:
             time.sleep(0.1)
             timeMillisecs = int(round(time.time() * 1000))
@@ -71,6 +60,5 @@ class Client:
 
 
     def lastSend(self):
-        """Send one final batch of "traceroute" packets"""
         self.sending = False
         self.sendTraceroutes()

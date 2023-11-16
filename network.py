@@ -15,12 +15,8 @@ from LSrouter import LSrouter
 
 
 class Network:
-    """Network class maintains all clients, routers, links, and configuration"""
 
     def __init__(self, netJsonFilepath, routerClass, visualize=False):
-        """Create a new network from the parameters in the file at
-           netJsonFilepath.  routerClass determines whether to use DVrouter,
-           LSrouter, or the default Router"""
 
         # parse configuration details
         netJsonFile = open(netJsonFilepath, 'r')
@@ -53,7 +49,6 @@ class Network:
 
 
     def parseRouters(self, routerParams, routerClass):
-        """Parse routes from routerParams dict"""
         routers = {}
         for addr in routerParams:
             #print "Router {}".format(addr)
@@ -62,7 +57,6 @@ class Network:
 
 
     def parseClients(self, clientParams, clientSendRate):
-        """Parse clients from clientParams dict"""
         clients = {}
         for addr in clientParams:
             #print "Client {}".format(addr)
@@ -72,7 +66,6 @@ class Network:
 
 
     def parseLinks(self, linkParams):
-        """Parse links from linkParams, dict"""
         links = {}
         for addr1, addr2, latency in linkParams:
             link = Link(addr1, addr2, latency, self.latencyMultiplier)
@@ -99,9 +92,6 @@ class Network:
 
 
     def run(self):
-        """Run the network.  Start threads for each client and router. Start
-           thread to track link changes.  If not visualizing, wait until
-           end time and then print final routes"""
         for router in self.routers.values():
             self.threads.append(thread.start_new_thread(router.runRouter, ()))
         for client in self.clients.values():
@@ -130,8 +120,6 @@ class Network:
 
 
     def handleChanges(self):
-        """Handle changes to links. Run this method in a separate thread.
-           Uses a priority queue to track time of next change"""
         startTime = time.time() * 1000
         while not self.changes.empty():
             changeTime, target, change = self.changes.get()
@@ -163,8 +151,6 @@ class Network:
 
 
     def updateRoute(self, src, dst, route):
-        """Callback function used by clients to update the
-           current routes taken by traceroute packets"""
         self.routesLock.acquire()
         timeMillisecs = int(round(time.time() * 1000))
         isGood = route in self.correctRoutes[(src,dst)]
@@ -179,8 +165,6 @@ class Network:
 
 
     def getRouteString(self, labelIncorrect=True):
-        """Create a string with all the current routes found by traceroute
-           packets and whether they are correct"""
         self.routesLock.acquire()
         routeStrings = []
         allCorrect = True
@@ -199,8 +183,6 @@ class Network:
 
 
     def getRoutePickle(self):
-        """Create a pickle with the current routes
-           found by traceroute packets"""
         self.routesLock.acquire()
         routePickle = pickle.dumps(self.routes)
         self.routesLock.release()
@@ -208,14 +190,12 @@ class Network:
 
 
     def resetRoutes(self):
-        """Reset the routes foudn by traceroute packets"""
         self.routesLock.acquire()
         self.routes = {}
         self.routesLock.release()
 
 
     def finalRoutes(self):
-        """Have the clients send one final batch of traceroute packets"""
         self.resetRoutes()
         for client in self.clients.values():
             client.lastSend()
@@ -223,7 +203,6 @@ class Network:
 
 
 def main():
-    """Main function parses command line arguments and runs network"""
     if len(sys.argv) < 2:
         print "Usage: python network.py [networkSimulationFile.json] " \
               "[DV|LS (router class, optional)]"

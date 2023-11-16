@@ -5,15 +5,9 @@ import Queue
 
 
 class Router:
-    """
-    Router superclass that handles the details of
-    packet send/receive and link changes.
-    Subclass this class and override the "handle..." methods
-    to implement routing algorithm functionality
-    """
 
     def __init__(self, addr, heartbeatTime = None):
-        """Initialize Router address and threadsafe queue for link changes"""
+    
         self.addr = addr            # address of router
         self.nextFreePort = 1
         self.portMap = {}           # links indexed by port
@@ -22,16 +16,12 @@ class Router:
 
 
     def changeLink(self, change):
-        """
-        Add, remove, or change the cost of a link.
-        The change argument is a tuple with first element
-        'up', or 'down'
-        """
+       
         self.linkChanges.put(change)
 
 
     def addLink(self, endpointAddr, link, cost):
-        """Add new link to router"""
+        
         if link in self.portMap:
             port = self.removeLink(link)
         else:
@@ -44,7 +34,7 @@ class Router:
 
 
     def removeLink(self, link):
-        """Remove link from router"""
+    
         port = self.portMap[link]
         del self.portMap[link]
         del self.linkMap[port]
@@ -54,7 +44,7 @@ class Router:
 
 
     def runRouter(self):
-        """Main loop of router"""
+    
         while True:
             time.sleep(0.1)
             timeMillisecs = int(round(time.time() * 1000))
@@ -74,38 +64,36 @@ class Router:
 
 
     def send(self, port, packet):
-        """Send a packet out given port"""
+        
         try:
             self.linkMap[port].send(packet, self.addr)
         except KeyError:
             pass
 
-    """
-    TODO: These are the functions you should override in your implementations
-    """
+   
 
 
     def handlePacket(self, port, packet):
-        """process incoming packet"""
+        
         # default implementation sends packet back out the port it arrived
         self.send(port, packet)
 
 
     def handleNewLink(self, port, endpoint, cost):
-        """handle new link"""
+        
         pass
 
 
     def handleRemoveLink(self, port):
-        """handle removed link"""
+        
         pass
 
 
     def handleTime(self, timeMillisecs):
-        """handle current time"""
+        
         pass
 
 
     def debugString(self):
-        """generate a string for debugging in network visualizer"""
+        
         return "Mirror router: address {}".format(self.addr)

@@ -7,17 +7,7 @@ from types import StringType
 
 
 class Link:
-    """
-    Link class represents link between two routers/clients
-    handles sending and receiving packets using
-    threadsafe queues
-    """
-
     def __init__(self, e1, e2, latency, latencyMultiplier):
-        """
-        Create queues. e1 & e2 are addresses of the 2 endpoints of the link.
-        latency is the latency (in ms) of the link
-        """
         self.q12 = Queue.Queue()
         self.q21 = Queue.Queue()
         self.latency = latency * latencyMultiplier
@@ -27,10 +17,7 @@ class Link:
 
 
     def send_helper(self, packet, src):
-        """
-        Run in a separate thread and sends packet on
-        link FROM src after waiting for the appropriate latency
-        """
+    
         if src == self.e1:
             packet.addToRoute(self.e2)
             packet.animateSend(self.e1, self.e2, self.latency)
@@ -45,11 +32,7 @@ class Link:
 
 
     def send(self, packet, src):
-        """
-        Sends packet on link FROM src. Checks that packet content is
-        a string and starts a new thread to send it.
-        (src must be equal to self.e1 or self.e2)
-        """
+    
         if packet.content:
             assert type(packet.content) is StringType, \
                    "Packet content must be a string"
@@ -58,11 +41,7 @@ class Link:
 
 
     def recv(self, dst, timeout=None):
-        """
-        Checks whether a packet is ready to be received by dst on this link.
-        dst must be equal to self.e1 or self.e2.  If packet is ready, returns
-        the packet, else returns None.
-        """
+    
         if dst == self.e1:
             try:
                 packet = self.q21.get_nowait()
@@ -78,7 +57,5 @@ class Link:
 
 
     def changeLatency(self, latency):
-        """
-        Update the latency of sending on the link.
-        """
+       
         self.latency = latency * self.latencyMultiplier

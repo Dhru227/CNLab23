@@ -13,7 +13,7 @@ from LSrouter import LSrouter
 
 
 class App:
-    """Tkinter GUI application for network simulation visualizations"""
+
 
     def __init__(self, root, network, networkParams):
         self.network = network
@@ -63,7 +63,7 @@ class App:
         thread.start_new_thread(self.displayCurrentDebug, ())
 
     def calcRectCenters(self):
-        """Compute the centers of the rectangles representing clients/routers"""
+        
         rectCenters = {}
         gridSize = int(self.networkParams["visualize"]["gridSize"])
         self.boxWidth = self.canvasWidth / gridSize
@@ -76,7 +76,7 @@ class App:
 
 
     def drawLines(self):
-        """draw lines corresponding to links"""
+    
         lines = {}
         lineLabels = {}
         for addr1, addr2, latency in self.networkParams["links"]:
@@ -87,7 +87,7 @@ class App:
 
 
     def drawLine(self, addr1, addr2, latency):
-        """draw a single line corresponding to one link"""
+        
         center1, center2 = self.rectCenters[addr1], self.rectCenters[addr2]
         line = self.canvas.create_line(center1[0], center1[1], center2[0], center2[1],
                                        width=self.networkParams["visualize"]["lineWidth"],
@@ -101,7 +101,7 @@ class App:
 
 
     def drawRectangles(self):
-        """draw rectangles corresponding to clients/routers"""
+        
         rects = {}
         for label in self.rectCenters:
             if label in self.network.clients:
@@ -118,7 +118,7 @@ class App:
 
 
     def inspectClientOrRouter(self, addr):
-        """Handle a mouse click on a client or router"""
+        
         if addr in self.network.clients:
             if self.clientFollowing:
                 self.canvas.itemconfig(self.rects[self.clientFollowing], width=1)
@@ -138,8 +138,7 @@ class App:
 
 
     def packetSend(self, packet, src, dst, latency):
-        """Callback function used by Packet to tell the visualization that
-           a packet is being sent"""
+        
         if self.clientFollowing:
             if packet.dstAddr == self.clientFollowing and packet.isTraceroute():
                 fillColor = "green"
@@ -158,7 +157,7 @@ class App:
 
 
     def movePacket(self, packetRect, vx, vy, numSteps, stepTime):
-        """Animate a moving packet.  This should be run on a separate thread"""
+    
         s = numSteps
         while s > 0:
             time.sleep(stepTime)
@@ -168,7 +167,7 @@ class App:
 
 
     def displayCurrentRoutes(self):
-        """Display the current routes found by traceroute packets"""
+        
         while True:
             routeString = self.network.getRouteString(labelIncorrect=False)
             pos = self.routeScrollbar.get()
@@ -179,7 +178,7 @@ class App:
 
 
     def displayCurrentDebug(self):
-        """Display the debug string of the currently selected router"""
+        
         while True:
             if self.routerFollowing:
                 debugText = self.network.routers[self.routerFollowing].debugString()
@@ -191,8 +190,7 @@ class App:
 
 
     def visualizeChanges(self, change, target):
-        """Make color and text changes to links upon additions, removals,
-           and cost changes"""
+    
         if change == "up":
             addr1, addr2, latency = target
             newLine, newLabel = self.drawLine(addr1, addr2, latency)
@@ -205,8 +203,7 @@ class App:
 
 
 def main():
-    """Main function parses command line arguments and
-       runs the network visualizer"""
+    
     if len(sys.argv) < 2:
         print ("Usage: python network.py [networkSimulationFile.json] [DV|LS (router class, optional)]")
         return
