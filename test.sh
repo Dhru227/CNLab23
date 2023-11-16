@@ -12,7 +12,7 @@ fi
 function test {
   printf "\nTesting $2 with $1router\n"
   printf "____________________________\n"
-  python network.py $2 $1 
+  python2.7 network.py $2 $1 
   printf "\n"
 }
 
